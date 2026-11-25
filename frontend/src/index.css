@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+@theme {
+  /* sala de audição: madeira escura, marfim e uma cor de vinil por estrutura */
+  --color-nogueira: #1c1410;
+  --color-painel: #2a1e17;
+  --color-veio: #4a372b;
+  --color-marfim: #f3ece3;
+  --color-poeira: #b5a495;
+  --color-pilha: #f2629b;
+  --color-fila: #4ea8ff;
+  --color-lista: #ffc247;
+  --color-brasa: #ff6a3d;
+  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+/* `--cor` é a cor do vinil da estrutura aberta; definida no elemento raiz de cada tela. */
+@theme inline {
+  --color-cor: var(--cor, var(--color-marfim));
+}
+
+/* Só em aparelhos com mouse: em toque não existe "passar por cima", então nada pode depender disso. */
+@custom-variant pode-pairar (@media (hover: hover) and (pointer: fine));
+
+@layer base {
+  html {
+    /* a barra do player fica fixa embaixo: o foco do teclado nunca pode ficar escondido atrás dela */
+    scroll-padding-bottom: 8rem;
+  }
+  body {
+    @apply bg-nogueira font-sans text-marfim antialiased;
+    font-feature-settings: "tnum" 1;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-cor;
+  }
+  /* Tailwind v4 tira a mãozinha dos botões; aqui ela volta para tudo que é clicável */
+  button:not(:disabled),
+  [role="tab"],
+  summary,
+  label:has(> input[type="radio"]) {
+    cursor: pointer;
+  }
+  input[type="range"] {
+    accent-color: var(--cor, var(--color-marfim));
+  }
+}
+
+/* Títulos de capa de disco: Archivo bem condensado e pesado. */
+@utility capa-titulo {
+  font-stretch: 62.5%;
+  font-weight: 850;
+  line-height: 0.92;
+  letter-spacing: -0.01em;
+}
+
+/* --- vinil ------------------------------------------------------------- */
+@utility vinil-disco {
+  background:
+    repeating-radial-gradient(circle, rgb(0 0 0 / 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(circle, color-mix(in oklab, var(--disco) 62%, black) 0 55%, color-mix(in oklab, var(--disco) 38%, black) 100%);
+  box-shadow:
+    inset 0 0 0 2px color-mix(in oklab, var(--disco) 30%, black),
+    0 18px 40px -18px rgb(0 0 0 / 0.8);
+}
+
+/* reflexo de luz: fica parado enquanto o disco gira por baixo */
+@utility vinil-brilho {
+  background: conic-gradient(
+    from 20deg,
+    transparent 0 8%,
+    rgb(255 255 255 / 0.2) 12%,
+    transparent 18% 50%,
+    rgb(255 255 255 / 0.12) 60%,
+    transparent 66%
+  );
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* 33⅓ rotações por minuto = 1,8 s por volta */
+@utility gira {
+  animation: girar 1.8s linear infinite;
+  animation-play-state: paused;
+  &[data-girando="true"] {
+    animation-play-state: running;
+  }
+}
+
+/* --- equalizador da música tocando ------------------------------------------ */
+@keyframes pulsar {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@utility eq-barra {
+  transform-origin: bottom;
+  transform: scaleY(0.3);
+  animation: pulsar 0.9s ease-in-out infinite;
+  animation-play-state: paused;
+  [data-girando="true"] > & {
+    animation-play-state: running;
+  }
+}
+
+/* --- painel "Ver estrutura": grade fina de prancheta --------------------------- */
+@utility prancheta {
+  background-color: color-mix(in oklab, var(--color-nogueira) 70%, black);
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--color-veio) 40%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--color-veio) 40%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gira,
+  .eq-barra {
+    animation: none;
+  }
+}

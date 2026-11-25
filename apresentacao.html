@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpotDSA — Apresentação do Projeto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..100,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --nogueira: #1c1410;
+      --nogueira-escuro: #130d0a;
+      --painel: #2a1e17;
+      --painel-claro: #35271e;
+      --veio: #4a372b;
+      --marfim: #f3ece3;
+      --poeira: #b5a495;
+      --pilha: #f2629b;
+      --fila: #4ea8ff;
+      --lista: #ffc247;
+      --brasa: #ff6a3d;
+      --verde: #5eead4;
+      --font-sans: "Archivo", ui-sans-serif, system-ui, -apple-system, sans-serif;
+      --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: var(--nogueira-escuro);
+      color: var(--marfim);
+      font-family: var(--font-sans);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Stage 16:9 responsivo */
+    .stage {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 20px 64px;
+    }
+
+    .deck {
+      position: relative;
+      width: min(1280px, 100%);
+      aspect-ratio: 16 / 9;
+      max-height: calc(100vh - 84px);
+      background: var(--nogueira);
+      border: 1px solid var(--veio);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 48px 58px 42px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(28px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    .slide.prev {
+      transform: translateX(-28px);
+    }
+
+    /* Fundo prancheta sutil */
+    .bg-prancheta {
+      background-color: var(--nogueira);
+      background-image:
+        radial-gradient(circle at 88% 18%, rgba(255, 194, 71, 0.08), transparent 40%),
+        linear-gradient(rgba(74, 55, 43, 0.22) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74, 55, 43, 0.22) 1px, transparent 1px);
+      background-size: 100% 100%, 28px 28px, 28px 28px;
+    }
+
+    /* Cabeçalho do slide */
+    .slide-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--poeira);
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--accent, var(--lista));
+      box-shadow: 0 0 12px var(--accent, var(--lista));
+    }
+
+    .slide-num {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--poeira);
+    }
+
+    h1 {
+      font-stretch: 75%;
+      font-weight: 850;
+      line-height: 0.96;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      font-stretch: 82%;
+      font-weight: 800;
+      font-size: clamp(28px, 3vw, 40px);
+      line-height: 1.08;
+      letter-spacing: -0.015em;
+      margin-bottom: 18px;
+    }
+
+    h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .lead {
+      font-size: clamp(16px, 1.55vw, 20px);
+      line-height: 1.5;
+      color: var(--poeira);
+    }
+
+    .body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 0;
+    }
+
+    /* Cards & Grids */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+    .card {
+      background: var(--painel);
+      border: 1px solid var(--veio);
+      border-radius: 14px;
+      padding: 20px 22px;
+    }
+
+    .card-accent {
+      border-top: 3px solid var(--accent, var(--lista));
+    }
+
+    .card p, .card li {
+      font-size: 15px;
+      line-height: 1.52;
+      color: var(--poeira);
+    }
+
+    .card strong { color: var(--marfim); }
+
+    ul.clean {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    ul.clean li {
+      position: relative;
+      padding-left: 18px;
+    }
+
+    ul.clean li::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: var(--accent, var(--lista));
+    }
+
+    /* Pills e badges */
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      border: 1px solid var(--veio);
+      background: rgba(28, 20, 16, 0.7);
+      color: var(--marfim);
+    }
+
+    .pill.pilha { border-color: rgba(242, 98, 155, 0.55); color: var(--pilha); }
+    .pill.fila { border-color: rgba(78, 168, 255, 0.55); color: var(--fila); }
+    .pill.lista { border-color: rgba(255, 194, 71, 0.55); color: var(--lista); }
+    .pill.brasa { border-color: rgba(255, 106, 61, 0.55); color: var(--brasa); }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      background: rgba(19, 13, 10, 0.8);
+      border: 1px solid var(--veio);
+      padding: 1px 6px;
+      border-radius: 5px;
+      color: var(--marfim);
+    }
+
+    /* Slide 1: Capa com vinil girando */
+    .cover-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      align-items: center;
+      gap: 40px;
+      height: 100%;
+    }
+
+    .cover-title {
+      font-size: clamp(56px, 7vw, 92px);
+      margin: 14px 0 18px;
+      background: linear-gradient(100deg, var(--marfim) 45%, var(--lista) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .vinyl-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .vinyl {
+      width: 310px;
+      height: 310px;
+      border-radius: 50%;
+      position: relative;
+      background:
+        repeating-radial-gradient(circle, rgba(0, 0, 0, 0.28) 0 1.5px, transparent 1.5px 4.5px),
+        radial-gradient(circle, #38261d 0 54%, #160f0c 100%);
+      box-shadow:
+        inset 0 0 0 3px rgba(255, 194, 71, 0.25),
+        0 24px 60px rgba(0, 0, 0, 0.85);
+      animation: spin 7s linear infinite;
+    }
+
+    .vinyl::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 20deg,
+        transparent 0 8%,
+        rgba(255, 255, 255, 0.16) 13%,
+        transparent 19% 50%,
+        rgba(255, 255, 255, 0.1) 60%,
+        transparent 68%
+      );
+    }
+
+    .vinyl-ring {
+      position: absolute;
+      inset: 24px;
+      border-radius: 50%;
+      border: 2px dashed rgba(242, 98, 155, 0.35);
+    }
+
+    .vinyl-ring-2 {
+      position: absolute;
+      inset: 52px;
+      border-radius: 50%;
+      border: 2px dashed rgba(78, 168, 255, 0.35);
+    }
+
+    .vinyl-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 112px;
+      height: 112px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, var(--lista), var(--brasa));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--nogueira);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: inset 0 0 0 3px rgba(28, 20, 16, 0.3);
+      z-index: 2;
+    }
+
+    .vinyl-hole {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--nogueira);
+      margin-bottom: 4px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Visualizações de Estruturas (prancheta) */
+    .board {
+      background: rgba(19, 13, 10, 0.85);
+      background-image:
+        linear-gradient(rgba(74, 55, 43, 0.25) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74, 55, 43, 0.25) 1px, transparent 1px);
+      background-size: 20px 20px;
+      border: 1px solid var(--veio);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+
+    .board-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--poeira);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .slots {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .slot {
+      flex: 1;
+      border-radius: 10px;
+      padding: 10px 8px;
+      text-align: center;
+      font-family: var(--font-mono);
+      border: 1px solid var(--veio);
+      background: var(--painel);
+      position: relative;
+    }
+
+    .slot.filled {
+      border-color: var(--accent, var(--lista));
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+
+    .slot.empty {
+      background: transparent;
+      border-style: dashed;
+      color: var(--poeira);
+      opacity: 0.7;
+    }
+
+    .slot .idx {
+      font-size: 11px;
+      color: var(--poeira);
+      margin-bottom: 4px;
+    }
+
+    .slot .val {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--marfim);
+    }
+
+    .slot .tag {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--accent, var(--lista));
+      color: var(--nogueira);
+    }
+
+    .chain {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+
+    .node-box {
+      min-width: 96px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--painel);
+      border: 1px solid var(--accent, var(--lista));
+      text-align: center;
+    }
+
+    .node-box .n-title { font-size: 13px; font-weight: 700; }
+    .node-box .n-sub { font-family: var(--font-mono); font-size: 11px; color: var(--poeira); margin-top: 2px; }
+
+    .arrow {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent, var(--lista));
+    }
+
+    .null-box {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--poeira);
+      padding: 6px 10px;
+      border: 1px dashed var(--veio);
+      border-radius: 8px;
+    }
+
+    /* Tabela comparativa */
+    table.comp {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      background: var(--painel);
+      border: 1px solid var(--veio);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    table.comp th, table.comp td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--veio);
+    }
+
+    table.comp th {
+      background: rgba(19, 13, 10, 0.75);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--poeira);
+    }
+
+    table.comp tr:last-child td { border-bottom: none; }
+
+    .ok { color: var(--verde); font-weight: 700; }
+    .no { color: #8c7b6e; }
+    .mono { font-family: var(--font-mono); font-size: 12.5px; }
+
+    /* Tabs interativas no slide de Listas */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      background: var(--painel);
+      color: var(--poeira);
+      border: 1px solid var(--veio);
+      border-radius: 999px;
+      padding: 7px 15px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover { color: var(--marfim); border-color: var(--lista); }
+    .tab-btn.active {
+      background: var(--lista);
+      color: var(--nogueira);
+      border-color: var(--lista);
+      font-weight: 600;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Arquitetura */
+    .arch-flow {
+      display: grid;
+      grid-template-columns: 1fr 44px 1fr 44px 1fr;
+      align-items: stretch;
+      gap: 4px;
+    }
+
+    .arch-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--lista);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      gap: 4px;
+    }
+
+    .arch-arrow span { font-size: 22px; line-height: 1; }
+
+    /* Rodapé do slide */
+    .slide-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      margin-top: 14px;
+      border-top: 1px solid rgba(74, 55, 43, 0.6);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--poeira);
+    }
+
+    /* Barra de controles inferior */
+    .controls {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 54px;
+      background: rgba(19, 13, 10, 0.92);
+      border-top: 1px solid var(--veio);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      gap: 16px;
+      z-index: 20;
+    }
+
+    .ctrl-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ctrl-btn {
+      background: var(--painel);
+      color: var(--marfim);
+      border: 1px solid var(--veio);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .ctrl-btn:hover { border-color: var(--lista); background: var(--painel-claro); }
+    .ctrl-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .progress-wrap {
+      flex: 1;
+      max-width: 460px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--painel);
+      border-radius: 999px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--pilha), var(--fila), var(--lista));
+      width: 10%;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--poeira);
+      min-width: 52px;
+      text-align: right;
+    }
+
+    .hint {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--poeira);
+    }
+
+    /* Modo Visão Geral (Overview) */
+    .overview-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(19, 13, 10, 0.94);
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      padding: 28px 36px;
+      overflow-y: auto;
+    }
+
+    .overview-modal.open { display: flex; }
+
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 14px;
+    }
+
+    .thumb {
+      background: var(--painel);
+      border: 1px solid var(--veio);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .thumb:hover { border-color: var(--lista); transform: translateY(-2px); }
+    .thumb.current { border-color: var(--lista); box-shadow: 0 0 0 2px rgba(255, 194, 71, 0.25); }
+    .thumb .t-num { font-family: var(--font-mono); font-size: 11px; color: var(--poeira); }
+    .thumb .t-title { font-size: 15px; font-weight: 700; margin-top: 6px; color: var(--marfim); }
+    .thumb .t-sub { font-size: 12px; color: var(--poeira); margin-top: 4px; }
+
+    /* Print / Exportar para PDF */
+    @media print {
+      html, body { overflow: visible; height: auto; background: var(--nogueira); }
+      .controls, .overview-modal { display: none !important; }
+      .stage { position: static; padding: 0; display: block; }
+      .deck {
+        width: 100%;
+        max-height: none;
+        aspect-ratio: auto;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        overflow: visible;
+      }
+      .slide {
+        position: relative;
+        opacity: 1 !important;
+        transform: none !important;
+        pointer-events: auto;
+        page-break-after: always;
+        break-after: page;
+        height: 100vh;
+        width: 100vw;
+      }
+      .tab-panel { display: block !important; margin-bottom: 10px; }
+      .tabs { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="stage">
+    <div class="deck" id="deck">
+
+      <!-- SLIDE 1: CAPA -->
+      <section class="slide bg-prancheta active" data-title="SpotDSA — Capa" data-sub="Player interativo de Estruturas de Dados">
+        <div class="slide-top">
+          <span class="eyebrow"><span class="dot" style="--accent: var(--lista)"></span> Apresentação de Projeto · Estruturas de Dados</span>
+          <span class="slide-num">01 / 10</span>
+        </div>
+
+        <div class="body">
+          <div class="cover-grid">
+            <div>
+              <div class="pills" style="margin-top: 0; margin-bottom: 12px;">
+                <span class="pill pilha">Pilha (LIFO)</span>
+                <span class="pill fila">Fila (FIFO)</span>
+                <span class="pill lista">Listas</span>
+              </div>
+              <h1 class="cover-title">SpotDSA</h1>
+              <p class="lead">
+                Um player de música onde cada playlist é governada por uma
+                <strong style="color: var(--marfim)">Estrutura de Dados real</strong> —
+                com áudio da Deezer, visualização de memória ao vivo e narração passo a passo.
+              </p>
+              <div class="pills" style="margin-top: 24px;">
+                <span class="pill">Python + Flask</span>
+                <span class="pill">React 19 + Tailwind v4</span>
+                <span class="pill">8 Estruturas do Zero</span>
+                <span class="pill">API Deezer</span>
+              </div>
+            </div>
+
+            <div class="vinyl-wrap">
+              <div class="vinyl">
+                <div class="vinyl-ring"></div>
+                <div class="vinyl-ring-2"></div>
+                <div class="vinyl-label">
+                  <div class="vinyl-hole"></div>
+                  <span>SpotDSA</span>
+                  <span style="font-size: 10px; opacity: 0.75;">33⅓ RPM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-foot">
+          <span>SpotDSA · Estruturas de Dados na Prática</span>
+          <span>Use ← → ou Espaço para navegar</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: PROBLEMA E PROPOSTA -->
+      <section class="slide bg-prancheta" data-title="Problema & Proposta" data-sub="Por que construir um player com DSA?">
+        <div class="slide-top">
+          <span class="eyebrow"><span class="dot" style="--accent: var(--brasa)"></span> Motivação</span>
+          <span class="slide-num">02 / 10</span>
+        </div>
+
+        <div class="body">
+          <h2>Por que transformar Estruturas de Dados em um Player?</h2>
+          <div class="grid-3">
+            <div class="card card-accent" style="--accent: var(--brasa)">
+              <h3>O Desafio</h3>
+              <p>
+                Ponteiros, filas circulares e deslocamentos em vetores costumam ficar
+                abstratos no papel. É fácil decorar a definição, mas difícil <strong>sentir o impacto</strong> de escolher uma estrutura em vez de outra.
+              </p>
+            </div>
+
+            <div class="card card-accent" style="--accent: var(--lista)">
+              <h3>A Solução: SpotDSA</h3>
+              <p>
+                Cada playlist nasce com uma estrutura escolhida pelo usuário. As <strong>regras da estrutura ditam o player</strong>: na Pilha não dá para voltar; na Fila a primeira música sai primeiro; na Lista você navega livremente.
+              </p>
+            </div>
+
+            <div class="card card-accent" style="--accent: var(--fila)">
+              <h3>Aprendizado Visual</h3>
+              <p>
+                A cada clique (adicionar, pular, remover), o painel <strong>"Ver estrutura"</strong> anima índices e ponteiros, enquanto o <strong>Narrador</strong> explica exatamente o que mudou na memória.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-foot">
+          <span>Problema → Ideia → Experiência Didática</span>
+          <span>SpotDSA</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: AS 8 ESTRUTURAS -->
+      <section class="slide bg-prancheta" data-title="As 8 Estruturas" data-sub="3 famílias × Vetor e Encadeada">
+        <div class="slide-top">
+          <span class="eyebrow"><span class="dot" style="--accent: var(--lista)"></span> Escopo do Projeto</span>
+          <span class="slide-num">03 / 10</span>
+        </div>
+
+        <div class="body">
+          <h2>3 Famílias, 8 Estruturas Implementadas do Zero</h2>
+          <div class="grid-3">
+            <div class="card card-accent" style="--accent: var(--pilha)">
+              <h3 style="color: var(--pilha)">1. Pilha (LIFO)</h3>
+              <ul class="clean" style="--accent: var(--pilha)">
+                <li><strong>PilhaVetor</strong> — vetor fixo + índice <code>topo</code></li>
+                <li><strong>PilhaEncadeada</strong> — nós simples + ponteiro <code>topo</code></li>
+              </ul>
+              <p style="margin-top: 14px; font-size: 13.5px;">
+                Última música adicionada toca imediatamente. Pular desempilha e remove do topo.
+              </p>
+            </div>
+
+            <div class="card card-accent" style="--accent: var(--fila)">
+              <h3 style="color: var(--fila)">2. Fila (FIFO)</h3>
+              <ul class="clean" style="--accent: var(--fila)">
+                <li><strong>FilaVetor</strong> — fila circular com <code>inicio</code>, <code>fim</code> e <code>quantidade</code></li>
+                <li><strong>FilaEncadeada</strong> — nós simples com <code>inicio</code> e <code>fim</code></li>
+              </ul>
+              <p style="margin-top: 14px; font-size: 13.5px;">
+                Entra no fim, toca o início. Pular desenfileira a música atual.
+              </p>
+            </div>
+
+            <div class="card card-accent" style="--accent: var(--lista)">
+              <h3 style="color: var(--lista)">3. Lista</h3>
+              <ul class="clean" style="--accent: var(--lista)">
+                <li><strong>ListaVetor</strong> — acesso direto + deslocamento</li>
+                <li><strong>ListaSimples</strong> — ponteiro só para <code>proximo</code></li>
+                <li><strong>ListaCircular</strong> — fim aponta para o início</li>
+                <li><strong>ListaDupla</strong> — <code>NoDuplo</code> (vai e volta)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center; padding: 14px 22px;">
+            <span style="font-size: 14.5px; color: var(--poeira);">
+              <strong style="color: var(--marfim)">Vetor:</strong> capacidade fixa definida na criação (<code>1</code> a <code>50</code>) · lança <code>EstruturaCheia</code> ao lotar.
+            </span>
+            <span style="font-size: 14.5px; color: var(--poeira);">
+              <strong style="color: var(--marfim)">Encadeada:</strong> cresce sob demanda usando <code>No</code> e <code>NoDuplo</code>, sem limite fixo.
+            </span>
+          </div>
+        </div>
+
+        <div class="slide-foot">
+          <span>Mapeadas em backend/spotdsa/playlist.py (CLASSES)</span>
+          <span>SpotDSA</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: PILHA -->
+      <section class="slide bg-prancheta" data-title="Pilha (LIFO)" data-sub="PilhaVetor & PilhaEncadeada">
+        <div class="slide-top">
+          <span class="eyebrow"><span class="dot" style="--accent: var(--pilha)"></span> Estrutura 01 · LIFO</span>
+          <span class="slide-num">04 / 10</span>
+        </div>
+
+        <div class="body">
+          <h2>Pilha: Última a Entrar, Primeira a Tocar</h2>
+          <div class="grid-2" style="--accent: var(--pilha)">
+            <div class="board">
+              <div class="board-label">
+                <span>PilhaVetor (capacidade = 4)</span>
+                <span>topo = 2</span>
+              </div>
+              <div class="slots">
+                <div class="slot filled"><div class="idx">[0]</div><div class="val">Música A</div></div>
+                <div class="slot filled"><div class="idx">[1]</div><div class="val">Música B</div></div>
+                <div class="slot filled"><div class="idx">[2]</div><div class="val">Música C</div><span class="tag">topo</span></div>
+                <div class="slot empty"><div class="idx">[3]</div><div class="val">vazia</div></div>
+              </div>
+              <p style="margin-top: 14px; font-size: 13.5px; color: var(--poeira);">
+                <code>topo = -1</code> indica pilha vazia. Ao desempilhar, a posição recebe <code>None</code> e <code>topo -= 1</code> — nenhum elemento precisa ser deslocado.
+              </p>
+            </div>
+
+            <div class="board">
+              <div class="board-label">
+                <span>PilhaEncadeada</span>
+                <span>topo → Música C</span>
+              </div>
+              <div class="chain" style="padding: 12px 0;">
+                <div class="node-box"><div class="n-title">Música C</div><div class="n-sub">topo</div></div>
+                <span class="arrow">→</span>
+                <div class="node-box"><div class="n-title">Música B</div><div class="n-sub">nó</div></div>
+                <span class="arrow">→</span>
+                <div class="node-box"><div class="n-title">Música A</div><div class="n-sub">base</div></div>
+                <span class="arrow">→</span>
+                <div class="null-box">None</div>
+              </div>
+              <p style="margin-top: 14px; font-size: 13.5px; color: var(--poeira);">
+                Novo nó aponta para o antigo <code>topo</code> e assume a liderança. Tudo em tempo constante <strong>O(1)</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 18px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 14.5px; color: var(--poeira);">
+              <strong style="color: var(--marfim)">No Player:</strong> <code>adicionar = empilhar</code> · <code>proxima = desempilhar</code> · Botões de <em>voltar</em>, <em>escolher</em> e <em>remover</em> ficam bloqueados.
+            </span>
+            <span class="pill pilha">O(1) push / pop</span>
+          </div>
+        </div>
+
+        <div class="slide-foot">
+          <span>backend/spotdsa/estruturas/pilha.py</span>
+          <span>SpotDSA</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: FILA E FILA CIRCULAR -->
+      <section class="slide bg-prancheta" data-title="Fila (FIFO) & Circular" data-sub="FilaVetor circular & FilaEncadeada">
+        <div class="slide-top">
+          <span class="eyebrow"><span class="dot" style="--accent: var(--fila)"></span> Estrutura 02 · FIFO</span>
+          <span class="slide-num">05 / 10</span>
+        </div>
+
+        <div class="body">
+          <h2>Fila Circular em Vetor &amp; Fila Encadeada</h2>
+          <div class="grid-2" style="--accent: var(--fila)">
+            <div class="board">
+              <div class="board-label">
+                <span>FilaVetor Circular (cap = 4)</span>
+                <span>quantidade = 3</span>
+              </div>
+              <div class="slots">
+                <div class="slot filled"><div class="idx">[0]</div><div class="val">Música D</div></div>
+                <div class="slot empty"><div class="idx">[1]</div><div class="val">vazia</div><span class="tag">fim</span></div>
+                <div class="slot filled"><div class="idx">[2]</div><div class="val">Música B</div><span class="tag">início</span></div>
+                <div class="slot filled"><div class="idx">[3]</div><div class="val">Música C</div></div>
+              </div>
+              <p style="margin-top: 14px; font-size: 13.5px; color: var(--poeira);">
+                Avanço circular: <code>(i + 1) % capacidade</code> reaproveita o índice <code>[0]</code> liberado. O contador <code>quantidade</code> diferencia fila cheia de vazia quando <code>inicio == fim</code>.
+              </p>
+            </div>
+
+            <div class="board">
+              <div class="board-label">
+                <span>FilaEncadeada</span>
+                <span>inicio → B · fim → D</span>
+              </div>
+              <div class="chain" style="padding: 12px 0;">
+                <div class="node-box"><div class="n-title">Música B</div><div class="n-sub">início</div></div>
+                <span class="arrow">→</span>
+                <div class="node-box"><div class="n-title">Música C</div><div class="n-sub">nó</div></div>
+                <span class="arrow">→</span>
+                <div class="node-box"><div class="n-title">Música D</div><div class="n-sub">fim</div></div>
+                <span class="arrow">→</span>
+                <div class="null-box">None</div>
+              </div>
+              <p style="margin-top: 14px; font-size: 13.5px; color: var(--poeira);">
+                Guardar o ponteiro <code>fim</code> permite enfileirar em <strong>O(1)</strong> sem percorrer a fila inteira. Ao remover o último nó, <code>fim</code> também volta para <code>None</code>.
+              </p>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 18px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 14.5px; color: var(--poeira);">
+              <strong style="color: var(--marfim)">No Player:</strong> <code>adicionar = enfileirar</code> · <code>proxima = desenfileirar</code> · Ordem de reprodução: <code>B → C → D</code>.
+            </span>
+            <span class="pill fila">O(1) enqueue / dequeue</span>
+          </div>
+        </div>
+
+        <div class="slide-foot">
+          <span>backend/spotdsa/estruturas/fila.py</span>
+          <span>SpotDSA</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 6: LISTAS (INTERATIVO) -->
+      <section class="slide bg-prancheta" data-title="Listas (4 Variantes)" data-sub="Vetor, Simples, Circular e Dupla">
+        <div class="slide-top">
+          <span class="eyebrow"><span class="dot" style="--accent: var(--lista)"></span> Estrutura 03 · Acesso &amp; Navegação</span>
+          <span class="slide-num">06 / 10</span>
+        </div>
+
+        <div class="body" style="--accent: var(--lista)">
+          <h2>Listas: Tocar Não Remove — <code>atual</code> Navega</h2>
+
+          <div class="tabs" role="tablist">
+            <button class="tab-btn active" data-tab="l-vetor">ListaVetor</button>
+            <button class="tab-btn" data-tab="l-simples">ListaSimples</button>
+            <button class="tab-btn" data-tab="l-circular">ListaCircular</button>
+            <button class="tab-btn" data-tab="l-dupla">ListaDupla</button>
+          </div>
+
+          <div class="tab-panel active" id="l-vetor">
+            <div class="board">
+              <div class="board-label"><span>ListaVetor (acesso direto por índice)</span><span>tamanho = 3 · atual = 1</span></div>
+              <div class="slots">
+                <div class="slot filled"><div class="idx">[0]</div><div class="val">Faixa 1</div></div>
+                <div class="slot filled"><div class="idx">[1]</div><div class="val">Faixa 2</div><span class="tag">atual</span></div>
+                <div class="slot filled"><div class="idx">[2]</div><div class="val">Faixa 3</div></div>
+                <div class="slot empty"><div class="idx">[3]</div><div class="val">vazia</div></div>
+              </div>
+              <p style="margin-top: 14px; font-size: 14px; color: var(--poeira);">
+                <strong style="color: var(--marfim)">Trade-off clássico:</strong> ir para qualquer música ou voltar é <strong>O(1)</strong>, mas inserir/remover no meio desloca todos os elementos seguintes (<strong>O(n)</strong>) e exige recalcular <code>self.atual</code>.
+              </p>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="l-simples">
+            <div class="board">
+              <div class="board-label"><span>ListaSimples (ponteiro único: proximo)</span><span>anterior bloqueado</span></div>
+              <div class="chain" style="padding: 10px 0;">
+                <div class="node-box"><div class="n-title">Faixa 1</div><div class="n-sub">início</div></div>
+                <span class="arrow">→</span>
+                <div class="node-box"><div class="n-title">Faixa 2</div><div class="n-sub">atual</div></div>
+                <span class="arrow">→</span>
+                <div class="node-box"><div class="n-title">Faixa 3</div><div class="n-sub">nó</div></div>
+                <span class="arrow">→</span>
+                <div class="null-box">None</div>
+              </div>
+              <p style="margin-top: 14px; font-size: 14px; color: var(--poeira);">
+                Cada nó conhece apenas o próximo: dá para escolher faixa percorrendo desde <code>inicio</code> (<strong>O(n)</strong>) e avançar, mas <strong>não existe voltar</strong> (<code>PERMITE["anterior"] = False</code>).
+              </p>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="l-circular">
+            <div class="board">
+              <div class="board-label"><span>ListaCircular (herda de ListaSimples)</span><span>modo repetir infinito</span></div>
+              <div class="chain" style="padding: 10px 0;">
+                <div class="node-box"><div class="n-title">Faixa 1</div><div class="n-sub">início</div></div>
+                <span class="arrow">→</span>
+                <div class="node-box"><div class="n-title">Faixa 2</div><div class="n-sub">nó</div></div>
+                <span class="arrow">→</span>
+                <div class="node-box"><div class="n-title">Faixa 3</div><div class="n-sub">fim / atual</div></div>
+                <span class="arrow">↺</span>
+                <div class="null-box" style="border-color: var(--lista); color: var(--lista);">volta p/ Faixa 1</div>
+              </div>
+              <p style="margin-top: 14px; font-size: 14px; color: var(--poeira);">
+                Mantém o invariante <code>fim.proximo is inicio</code>. Ao pular a última música, volta automaticamente para a primeira! O método herdado <code>nos()</code> caminha <code>self.tamanho</code> passos para evitar loop infinito.
+              </p>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="l-dupla">
+            <div class="board">
+              <div class="board-label"><span>ListaDupla (NoDuplo: anterior ↔ proximo)</span><span>navegação bidirecional</span></div>
+              <div class="chain" style="padding: 10px 0;">
+                <div class="null-box">None</div>
+                <span class="arrow">←</span>
+                <div class="node-box"><div class="n-title">Faixa 1</div><div class="n-sub">início</div></div>
+                <span class="arrow">↔</span>
+                <div class="node-box"><div class="n-title">Faixa 2</div><div class="n-sub">atual</div></div>
+                <span class="arrow">↔</span>
+                <div class="node-box"><div class="n-title">Faixa 3</div><div class="n-sub">fim</div></div>
+                <span class="arrow">→</span>
+                <div class="null-box">None</div>
+              </div>
+              <p style="margin-top: 14px; font-size: 14px; color: var(--poeira);">
+                Usa <code>NoDuplo</code> com ponteiros nos dois sentidos: libera o botão <strong>Anterior</strong> em <strong>O(1)</strong> e insere no final em <strong>O(1)</strong> direto por <code>self.fim</code>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-foot">
+          <span>Clique nas abas acima para alternar entre as 4 listas · backend/spotdsa/estruturas/lista.py</span>
+          <span>SpotDSA</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 7: TABELA COMPARATIVA -->
+      <section class="slide bg-prancheta" data-title="Comparativo & Complexidade" data-sub="Regras do player e Big-O">
+        <div class="slide-top">
+          <span class="eyebrow"><span class="dot" style="--accent: var(--verde)"></span> Análise Comparativa</span>
+          <span class="slide-num">07 / 10</span>
+        </div>
+
+        <div class="body">
+          <h2>Comparativo de Operações e Complexidade</h2>
+          <table class="comp">
+            <thead>
+              <tr>
+                <th>Estrutura</th>
+                <th>Memória</th>
+                <th>Voltar</th>
+                <th>Escolher / Remover</th>
+                <th>Adicionar</th>
+                <th>Pular / Remover</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong style="color: var(--pilha)">PilhaVetor</strong></td>
+                <td>Fixa (vetor)</td>
+                <td class="no">—</td>
+                <td class="no">—</td>
+                <td class="mono">O(1)</td>
+                <td class="mono">O(1) topo</td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--pilha)">PilhaEncadeada</strong></td>
+                <td>Dinâmica (nós)</td>
+                <td class="no">—</td>
+                <td class="no">—</td>
+                <td class="mono">O(1)</td>
+                <td class="mono">O(1) topo</td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--fila)">FilaVetor</strong> (circular)</td>
+                <td>Fixa (vetor)</td>
+                <td class="no">—</td>
+                <td class="no">—</td>
+                <td class="mono">O(1)</td>
+                <td class="mono">O(1) início</td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--fila)">FilaEncadeada</strong></td>
+                <td>Dinâmica (nós)</td>
+                <td class="no">—</td>
+                <td class="no">—</td>
+                <td class="mono">O(1)</td>
+                <td class="mono">O(1) início</td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--lista)">ListaVetor</strong></td>
+                <td>Fixa (vetor)</td>
+                <td class="ok">✓ O(1)</td>
+                <td class="ok">✓ Tocar O(1)</td>
+                <td class="mono">O(1) fim / O(n) meio</td>
+                <td class="mono">O(n) desloca</td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--lista)">ListaSimples</strong></td>
+                <td>Dinâmica (nós)</td>
+                <td class="no">—</td>
+                <td class="ok">✓ Busca O(n)</td>
+                <td class="mono">O(1) início / O(n)</td>
+                <td class="mono">O(1) início / O(n)</td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--lista)">ListaCircular</strong></td>
+                <td>Dinâmica (ciclo)</td>
+                <td class="no">— (repete ↺)</td>
+                <td class="ok">✓ Busca O(n)</td>
+                <td class="mono">O(1) início / O(n)</td>
+                <td class="mono">O(1) início / O(n)</td>
+              </tr>
+              <tr>
+                <td><strong style="color: var(--lista)">ListaDupla</strong></td>
+                <td>Dinâmica (↔)</td>
+                <td class="ok">✓ O(1)</td>
+                <td class="ok">✓ Busca O(n)</td>
+                <td class="mono">O(1) pontas / O(n)</td>
+                <td class="mono">O(n) busca + O(1)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="slide-foot">
+          <span>A estrutura escolhida define diretamente o comportamento e o custo computacional</span>
+          <span>SpotDSA</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 8: ARQUITETURA -->
+      <section class="slide bg-prancheta" data-title="Arquitetura do Sistema" data-sub="Frontend React · API Flask · Núcleo DSA">
+        <div class="slide-top">
+          <span class="eyebrow"><span class="dot" style="--accent: var(--fila)"></span> Arquitetura</span>
+          <span class="slide-num">08 / 10</span>
+        </div>
+
+        <div class="body">
+          <h2>Arquitetura Full-Stack Desacoplada</h2>
+          <div class="arch-flow">
+            <div class="card card-accent" style="--accent: var(--fila)">
+              <h3 style="color: var(--fila)">Frontend (React 19)</h3>
+              <ul class="clean" style="--accent: var(--fila)">
+                <li><strong>Vite + Tailwind CSS v4 + Motion</strong></li>
+                <li>Player com disco de vinil e áudio 30s</li>
+                <li><strong>Painel Estrutura</strong>: renderiza vetores e nós em tempo real</li>
+                <li><strong>Narrador</strong> (<code>explicacoes.js</code>): explica antes vs. depois de cada ação</li>
+              </ul>
+            </div>
+
+            <div class="arch-arrow">
+              <span>⇄</span>
+              <div>REST</div>
+              <div>JSON</div>
+            </div>
+
+            <div class="card card-accent" style="--accent: var(--brasa)">
+              <h3 style="color: var(--brasa)">Backend (Flask)</h3>
+              <ul class="clean" style="--accent: var(--brasa)">
+                <li><code>app.py</code> — rotas <code>/api/playlists</code> e tradução de erros HTTP</li>
+                <li><code>playlist.py</code> — validações, <code>exigir()</code> e <code>snapshot()</code></li>
+                <li><code>armazenamento.py</code> — salva em <code>playlists.json</code></li>
+                <li><code>deezer.py</code> — busca e preview oficial</li>
+              </ul>
+            </div>
+
+            <div class="arch-arrow">
+              <span>⇄</span>
+              <div>Python</div>
+              <div>puro</div>
+            </div>
+
+            <div class="card card-accent" style="--accent: var(--lista)">
+              <h3 style="color: var(--lista)">Núcleo DSA</h3>
+              <ul class="clean" style="--accent: var(--lista)">
+                <li><code>base.py</code> — <code>No</code>, <code>NoDuplo</code>, exceções e <code>validar_posicao</code></li>
+                <li><code>pilha.py</code> — Vetor e Encadeada</li>
+                <li><code>fila.py</code> — Circular e Encadeada</li>
+                <li><code>lista.py</code> — Vetor, Simples, Circular e Dupla</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-foot">
+          <span>As estruturas não conhecem HTTP nem React — funcionam de forma independente</span>
+          <span>SpotDSA</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 9: DECISÕES DE ENGENHARIA -->
+      <section class="slide bg-prancheta" data-title="Decisões de Engenharia" data-sub="Exceções, herança e persistência segura">
+        <div class="slide-top">
+          <span class="eyebrow"><span class="dot" style="--accent: var(--pilha)"></span> Boas Práticas no Código</span>
+          <span class="slide-num">09 / 10</span>
+        </div>
+
+        <div class="body">
+          <h2>Decisões de Engenharia &amp; Código Limpo</h2>
+          <div class="grid-2">
+            <div class="card card-accent" style="--accent: var(--pilha)">
+              <h3>Exceções Semânticas → HTTP</h3>
+              <p>
+                As estruturas lançam <code>EstruturaCheia</code>, <code>EstruturaVazia</code> e <code>ValueError</code>. O Flask intercepta centralmente em <code>@app.errorhandler</code> e retorna <strong>409</strong> ou <strong>400</strong> com mensagens claras para o player.
+              </p>
+            </div>
+
+            <div class="card card-accent" style="--accent: var(--lista)">
+              <h3>Herança Inteligente (<code>super()</code>)</h3>
+              <p>
+                <code>NoDuplo(No)</code> estende <code>No</code> com <code>anterior</code>. Já <code>ListaCircular</code> e <code>ListaDupla</code> herdam de <code>ListaSimples</code> — reaproveitando <code>nos()</code>, <code>tocar()</code>, <code>proxima()</code> e <code>em_ordem()</code> sem duplicar código.
+              </p>
+            </div>
+
+            <div class="card card-accent" style="--accent: var(--fila)">
+              <h3>Snapshot Unificado</h3>
+              <p>
+                Cada estrutura expõe <code>marcadores()</code> e <code>em_ordem()</code> (e <code>nos()</code> nas encadeadas). Assim o frontend desenha todas as 8 estruturas com apenas dois componentes visuais.
+              </p>
+            </div>
+
+            <div class="card card-accent" style="--accent: var(--verde)">
+              <h3>Persistência Atômica em JSON</h3>
+              <p>
+                <code>armazenamento.py</code> grava primeiro num arquivo <code>.tmp</code> e usa <code>os.replace</code> — evitando arquivos corrompidos e preservando até os índices da fila circular ao recarregar.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-foot">
+          <span>Código legível, modular e fácil de estender</span>
+          <span>SpotDSA</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 10: ENCERRAMENTO -->
+      <section class="slide bg-prancheta" data-title="Encerramento" data-sub="Demonstração ao vivo e perguntas">
+        <div class="slide-top">
+          <span class="eyebrow"><span class="dot" style="--accent: var(--lista)"></span> Demonstração &amp; Encerramento</span>
+          <span class="slide-num">10 / 10</span>
+        </div>
+
+        <div class="body" style="align-items: center;">
+          <div class="card" style="width: 100%; max-width: 720px; text-align: center; padding: 52px 44px; border-color: rgba(255, 194, 71, 0.45);">
+            <h2 style="font-size: clamp(34px, 4vw, 52px); color: var(--marfim); margin-bottom: 14px;">Obrigado pela atenção!</h2>
+            <p class="lead" style="margin-bottom: 24px;">Dúvidas, perguntas ou sugestões?</p>
+            <div class="pills" style="justify-content: center; margin-top: 0;">
+              <span class="pill pilha">Pilha · LIFO</span>
+              <span class="pill fila">Fila · FIFO</span>
+              <span class="pill lista">Listas · 4 Variantes</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-foot">
+          <span>SpotDSA · Estruturas de Dados em Python + React</span>
+          <span>Fim da Apresentação</span>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Barra de controles -->
+  <nav class="controls" aria-label="Controles da apresentação">
+    <div class="ctrl-group">
+      <button class="ctrl-btn" id="btn-prev" title="Slide anterior (←)">← Anterior</button>
+      <button class="ctrl-btn" id="btn-next" title="Próximo slide (→)">Próximo →</button>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar" title="Clique para pular">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <span class="progress-text" id="progress-text">1 / 10</span>
+    </div>
+
+    <div class="ctrl-group">
+      <button class="ctrl-btn" id="btn-overview" title="Visão geral dos slides (O)">Slides (O)</button>
+      <button class="ctrl-btn" id="btn-fullscreen" title="Tela cheia (F)">Tela cheia (F)</button>
+      <button class="ctrl-btn" id="btn-print" title="Exportar PDF (Ctrl+P)">PDF</button>
+    </div>
+  </nav>
+
+  <!-- Modal visão geral -->
+  <div class="overview-modal" id="overview">
+    <div class="overview-header">
+      <h2 style="margin: 0; font-size: 24px;">Visão Geral dos Slides</h2>
+      <button class="ctrl-btn" id="btn-close-overview">Fechar (Esc)</button>
+    </div>
+    <div class="overview-grid" id="overview-grid"></div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const btnOverview = document.getElementById('btn-overview');
+    const btnCloseOverview = document.getElementById('btn-close-overview');
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    const btnPrint = document.getElementById('btn-print');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    const progressBar = document.getElementById('progress-bar');
+    const overview = document.getElementById('overview');
+    const overviewGrid = document.getElementById('overview-grid');
+
+    let current = 0;
+
+    function buildOverview() {
+      overviewGrid.innerHTML = '';
+      slides.forEach((s, i) => {
+        const div = document.createElement('div');
+        div.className = 'thumb' + (i === current ? ' current' : '');
+        div.innerHTML = `
+          <div class="t-num">SLIDE ${String(i + 1).padStart(2, '0')}</div>
+          <div class="t-title">${s.dataset.title || ''}</div>
+          <div class="t-sub">${s.dataset.sub || ''}</div>
+        `;
+        div.addEventListener('click', () => {
+          goTo(i);
+          toggleOverview(false);
+        });
+        overviewGrid.appendChild(div);
+      });
+    }
+
+    function goTo(index) {
+      current = Math.max(0, Math.min(slides.length - 1, index));
+      slides.forEach((s, i) => {
+        s.classList.remove('active', 'prev');
+        if (i === current) s.classList.add('active');
+        else if (i < current) s.classList.add('prev');
+      });
+      const pct = ((current + 1) / slides.length) * 100;
+      progressFill.style.width = pct + '%';
+      progressText.textContent = `${current + 1} / ${slides.length}`;
+      btnPrev.disabled = current === 0;
+      btnNext.disabled = current === slides.length - 1;
+      history.replaceState(null, '', `#${current + 1}`);
+      buildOverview();
+    }
+
+    function toggleOverview(force) {
+      const open = force !== undefined ? force : !overview.classList.contains('open');
+      overview.classList.toggle('open', open);
+    }
+
+    btnPrev.addEventListener('click', () => goTo(current - 1));
+    btnNext.addEventListener('click', () => goTo(current + 1));
+    btnOverview.addEventListener('click', () => toggleOverview());
+    btnCloseOverview.addEventListener('click', () => toggleOverview(false));
+    btnPrint.addEventListener('click', () => window.print());
+
+    btnFullscreen.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.();
+      } else {
+        document.exitFullscreen?.();
+      }
+    });
+
+    progressBar.addEventListener('click', (e) => {
+      const rect = progressBar.getBoundingClientRect();
+      const ratio = (e.clientX - rect.left) / rect.width;
+      goTo(Math.floor(ratio * slides.length));
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') return toggleOverview(false);
+      if (overview.classList.contains('open')) return;
+      if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) {
+        e.preventDefault();
+        goTo(current + 1);
+      } else if (['ArrowLeft', 'PageUp'].includes(e.key)) {
+        e.preventDefault();
+        goTo(current - 1);
+      } else if (e.key === 'Home') {
+        goTo(0);
+      } else if (e.key === 'End') {
+        goTo(slides.length - 1);
+      } else if (e.key.toLowerCase() === 'o') {
+        toggleOverview();
+      } else if (e.key.toLowerCase() === 'f') {
+        btnFullscreen.click();
+      }
+    });
+
+    // Abas interativas no Slide 6 (Listas)
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab)?.classList.add('active');
+      });
+    });
+
+    // Abre no slide indicado no hash (#3), se houver
+    const hashNum = parseInt(location.hash.replace('#', ''), 10);
+    goTo(Number.isFinite(hashNum) ? hashNum - 1 : 0);
+  </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+# Ambientes virtuais Python
+.venv/
+venv/
+env/
+
+# Cache e build Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Frontend (Node / Vite)
+node_modules/
+frontend/dist/
+.vite/
+*.local
+
+# Variáveis de ambiente e dados locais
+.env
+.env.*
+backend/data/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
