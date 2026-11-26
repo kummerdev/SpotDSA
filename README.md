@@ -1,4 +1,4 @@
-# SpotDSA-Projeto De Estudo Academico
+# SpotDSA-Projeto De Estudo Acadêmico
 
 Player interativo de playlists desenvolvido para demonstrar, na prática e em tempo real, o funcionamento de **8 estruturas de dados** clássicas (em versões com vetor e encadeadas).
 
